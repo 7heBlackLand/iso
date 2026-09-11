@@ -1,0 +1,17 @@
+## Shadow GNU/Linux - essential utilities
+## Administration, diagnostics and small productivity tools.
+## Large security-tool collections and duplicate applications are avoided.
+
+apt
+dpkg
+sudo
+curl
+wget
+git
+nano
+htop
+neofetch
+file
+less
+python3
+openssl

@@ -1,0 +1,14 @@
+## Shadow GNU/Linux - networking
+## NetworkManager + Wi-Fi support while avoiding indiscriminate firmware.
+
+network-manager
+network-manager-gnome
+wpasupplicant
+rfkill
+wireless-tools
+
+## Selected Wi-Fi/ethernet firmware. The kali-linux-firmware metapackage from
+## kali-config/common already covers the broad hardware base.
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros

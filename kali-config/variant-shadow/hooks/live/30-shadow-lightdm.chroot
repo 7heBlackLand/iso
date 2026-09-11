@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Shadow LightDM hook
+#
+# Makes LightDM the default display manager. The LightDM configuration
+# itself ships as includes (etc/lightdm/).
+
+set -e
+
+# Ensure LightDM is the default display manager
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl enable lightdm.service 2>/dev/null || true
+  if [ -f /etc/alternatives/display-manager ]; then
+    update-alternatives --set display-manager /usr/sbin/lightdm 2>/dev/null || true
+  fi
+fi
+
+# The greeter should not run as an empty session; default to XFCE
+if [ -x /usr/bin/xfce4-session ] && [ ! -e /etc/X11/default-display-manager ]; then
+  echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
+fi
+
+exit 0

@@ -1,0 +1,98 @@
+#!/bin/sh
+
+# Shadow cleanup hook
+#
+# Principle: "Remove clutter, not capability".
+# Protected: firmware, networking, APT/dpkg, XFCE, audio, storage, kernel
+# functionality, required services, terminal persistence configuration,
+# live identity configuration and ShadowLipibangla.ttf.
+
+echo "Shadow cleanup: removing clutter (not capability)..."
+
+# Remove a package only if it is actually installed; otherwise skip it.
+# This keeps apt-get happy even when a name is unknown to the repository.
+purge_if_installed() {
+  for pkg in "$@"; do
+    if dpkg-query -W -f='${db:Status-Status}\n' "$pkg" 2>/dev/null | grep -q '^installed$'; then
+      echo "  removing: $pkg"
+      apt-get -y remove --purge "$pkg" >/dev/null 2>&1 || true
+    fi
+  done
+}
+
+# --- Unnecessary desktop cruft -------------------------------------------
+# Extra XFCE plugins that add widgets/screensavers we do not want
+purge_if_installed \
+    xfce4-clipman-plugin \
+    xfce4-datetime-plugin \
+    xfce4-screenshooter \
+    xfce4-screensaver \
+    xfce4-smartbookmark-plugin \
+    xfce4-weather-plugin \
+    xfce4-xkb-plugin
+
+# Heavy/duplicate graphical applications
+purge_if_installed \
+    libreoffice-core libreoffice-writer libreoffice-calc libreoffice-impress libreoffice-draw \
+    gimp inkscape blender vlc audacity shotwell mousepad
+
+# Games and entertainment
+purge_if_installed \
+    gnome-sudoku gnome-mines gnome-mahjongg quadrapassel swell-foop tali gnibbles \
+    gnome-chess gnome-games
+
+# Terminal policy: xfce4-terminal is the only graphical terminal emulator.
+purge_if_installed \
+    gnome-terminal lxterminal mate-terminal sakura tilix termite konsole xterm
+
+# Duplicate/excessive fonts (keep Fira Code, DejaVu, Liberation, Noto Core,
+# and the protected ShadowLipibangla.ttf)
+purge_if_installed \
+    fonts-arphic-uming \
+    fonts-baekmuk \
+    fonts-wqy-zenhei \
+    fonts-droid-fallback
+
+# --- Remove unnecessary autostart entries ---------------------------------
+rm -f /etc/xdg/autostart/*screensaver* 2>/dev/null || true
+rm -f /etc/xdg/autostart/*power-manager* 2>/dev/null || true
+rm -f /etc/xdg/autostart/spice-vdagent* 2>/dev/null || true
+
+# Point x-terminal-emulator at xfce4-terminal
+if command -v update-alternatives >/dev/null 2>&1 && \
+   update-alternatives --query x-terminal-emulator >/dev/null 2>&1 && \
+   [ -e /usr/bin/xfce4-terminal ]; then
+    update-alternatives --set x-terminal-emulator /usr/bin/xfce4-terminal 2>/dev/null || true
+fi
+
+# --- Package cache and orphaned dependencies -------------------------------
+apt-get -y autoremove --purge >/dev/null 2>&1 || true
+apt-get -y clean >/dev/null 2>&1 || true
+apt-get -y autoclean >/dev/null 2>&1 || true
+rm -rf /var/cache/apt/archives/*.deb 2>/dev/null || true
+
+# --- Safe documentation/cache cleanup ---------------------------------------
+# Trim /usr/share/doc but keep licence (copyright) files
+find /usr/share/doc -type f ! -name 'copyright' -delete 2>/dev/null || true
+find /usr/share/doc -type d -empty -delete 2>/dev/null || true
+
+rm -rf /var/log/*.gz 2>/dev/null || true
+rm -rf /tmp/* /var/tmp/* 2>/dev/null || true
+
+# --- Protect the Shadow font -------------------------------------------------
+FONT=/usr/share/fonts/truetype/custom/ShadowLipibangla.ttf
+if [ -f "$FONT" ]; then
+  echo "Shadow cleanup: ShadowLipibangla.ttf present and protected"
+  chmod 644 "$FONT"
+else
+  echo "WARNING: ShadowLipibangla.ttf missing from /usr/share/fonts/truetype/custom/"
+fi
+
+# Refresh the font cache if available
+if command -v fc-cache >/dev/null 2>&1; then
+  fc-cache -f >/dev/null 2>&1 || true
+fi
+
+echo "Shadow cleanup: done"
+
+exit 0

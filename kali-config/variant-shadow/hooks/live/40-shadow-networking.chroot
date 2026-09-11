@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Shadow networking and hardware hook
+#
+# Enables required services and wires up hardware/audio configuration.
+# Static config files ship as includes.
+
+set -e
+
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl enable NetworkManager.service 2>/dev/null || true
+  systemctl enable NetworkManager-wait-online.service 2>/dev/null || true
+fi
+
+# Unblock wireless devices (rfkill)
+if command -v rfkill >/dev/null 2>&1; then
+  rfkill unblock all 2>/dev/null || true
+fi
+
+# Reload udev rules if provided
+if command -v udevadm >/dev/null 2>&1 && [ -f /etc/udev/rules.d/99-shadow-hardware.rules ]; then
+  udevadm control --reload-rules 2>/dev/null || true
+fi
+
+# Make sure the live shadow user can access PipeWire/audio sockets
+# (the per-user config ships in /etc/skel)
+
+exit 0

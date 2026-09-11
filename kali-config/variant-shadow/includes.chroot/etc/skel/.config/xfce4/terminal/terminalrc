@@ -1,0 +1,28 @@
+[Configuration]
+FontName=Fira Code 12
+MiscAlwaysShowTabs=FALSE
+MiscBordersDefault=FALSE
+MiscConfirmClose=FALSE
+MiscCursorBlink=TRUE
+MiscCursorShape=TERMINAL_CURSOR_SHAPE_BLOCK
+MiscDefaultGeometry=120x35
+MiscMenubarDefault=FALSE
+MiscShowUnsafePasteDialog=TRUE
+MiscTabPosition=GTK_POS_TOP
+ScrollingLines=10000
+ScrollingOnOutput=TRUE
+MiscCopyOnSelect=TRUE
+MiscCycleTabBar=TRUE
+MiscTabCloseMiddleClick=TRUE
+
+# Shadow theme: black background, green foreground, block cursor
+ColorBackground=#000000
+ColorForeground=#00ff00
+ColorCursor=#00ff00
+ColorCursorForeground=#000000
+ColorSelection=#006400
+ColorSelectionForeground=#ffffff
+ColorCursorUseDefault=FALSE
+
+# ANSI palette preserved for a clean green-on-black terminal
+ColorPalette=#000000;#cc0000;#4E9A06;#C4A000;#3465A4;#75507B;#06989A;#D3D7CF;#555753;#EF2929;#8AE234;#FCE94F;#729FCF;#AD7FA8;#34E2E2;#EEEEEC

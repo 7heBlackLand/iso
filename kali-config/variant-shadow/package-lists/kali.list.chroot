@@ -1,0 +1,10 @@
+## Shadow GNU/Linux - base live image
+##
+## $ ./build.sh --variant shadow
+
+## Live images always want these
+kali-linux-core
+kali-desktop-live
+
+## Graphical desktop (XFCE), the only desktop environment
+kali-desktop-xfce

@@ -1,0 +1,7 @@
+## Shadow GNU/Linux - development support
+## Kernel headers + DKMS are retained to preserve hardware extension
+## capability (common/linux-headers.list.chroot already provides the
+## architecture-specific headers).
+
+build-essential
+dkms

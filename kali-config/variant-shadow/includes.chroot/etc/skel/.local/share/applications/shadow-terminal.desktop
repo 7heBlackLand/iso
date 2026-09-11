@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Terminal
+Name[en]=Terminal
+Comment=Use the command line
+Exec=sh -c 'exec ~/.local/bin/shadow-terminal'
+Icon=utilities-terminal
+Terminal=false
+Categories=System;TerminalEmulator;Utility;
+Keywords=shell;prompt;command;commandline;
+NoDisplay=false
+X-XFCE-Source=manual

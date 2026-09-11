@@ -1,0 +1,58 @@
+#!/bin/sh
+
+# Shadow terminal wrapper
+#
+# Lightweight persistence for the last manually resized terminal size.
+# On launch it restores the last saved width/height; while the terminal runs
+# it records geometry changes, and the last size is saved for next launch.
+# xfce4-terminal remains the only graphical terminal emulator underneath.
+
+set -u
+
+STATE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/shadow"
+STATE_FILE="$STATE_DIR/terminal-size"
+DEFAULT_W=120
+DEFAULT_H=35
+POLL=2
+
+# Restore last saved geometry
+if [ -r "$STATE_FILE" ]; then
+    read -r W H < "$STATE_FILE" 2>/dev/null || true
+    case "${W:-}" in
+        ''|*[!0-9]*) ;;
+        *) DEFAULT_W=$W ;;
+    esac
+    case "${H:-}" in
+        ''|*[!0-9]*) ;;
+        *) DEFAULT_H=$H ;;
+    esac
+fi
+
+# Launch xfce4-terminal with the (fallback or saved) geometry
+xfce4-terminal --geometry="${DEFAULT_W}x${DEFAULT_H}" "$@" &
+PID=$!
+
+# Save geometry while it runs (only if xdotool is available)
+if command -v xdotool >/dev/null 2>&1; then
+    LAST_W=$DEFAULT_W
+    LAST_H=$DEFAULT_H
+    while kill -0 "$PID" 2>/dev/null; do
+        sleep "$POLL"
+        WIN=$(xdotool search --class "xfce4-terminal" 2>/dev/null | tail -n 1)
+        if [ -n "$WIN" ]; then
+            GEO=$(xdotool getwindowgeometry --shell "$WIN" 2>/dev/null)
+            if [ -n "$GEO" ]; then
+                NW=$(printf '%s\n' "$GEO" | sed -n 's/^WIDTH=\([0-9][0-9]*\).*/\1/p')
+                NH=$(printf '%s\n' "$GEO" | sed -n 's/^HEIGHT=\([0-9][0-9]*\).*/\1/p')
+                [ -n "$NW" ] && [ "$NW" -gt 0 ] && LAST_W=$NW
+                [ -n "$NH" ] && [ "$NH" -gt 0 ] && LAST_H=$NH
+            fi
+        fi
+    done
+    mkdir -p "$STATE_DIR"
+    printf '%s %s\n' "$LAST_W" "$LAST_H" > "$STATE_FILE" 2>/dev/null
+else
+    wait "$PID"
+fi
+
+exit 0

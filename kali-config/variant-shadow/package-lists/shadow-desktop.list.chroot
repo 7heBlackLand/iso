@@ -1,0 +1,14 @@
+## Shadow GNU/Linux - desktop essentials
+## Lightweight XFCE desktop additions beyond the kali-desktop-xfce meta.
+
+## Display manager
+lightdm
+lightdm-gtk-greeter
+
+## File manager and removable media
+thunar
+gvfs-backends
+gvfs-fuse
+
+## Panel helpers that are part of a complete but lightweight desktop
+xfce4-appfinder

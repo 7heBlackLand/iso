@@ -1,0 +1,10 @@
+# Shadow GNU/Linux - ALSA default route (PipeWire/PulseAudio)
+pcm.!default {
+    type pulse
+    fallback "sysdefault"
+}
+
+ctl.!default {
+    type pulse
+    fallback "sysdefault"
+}
