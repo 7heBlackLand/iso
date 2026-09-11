@@ -12,7 +12,7 @@
 # and in the live-build configuration).
 
 get_user_list() {
-    echo kali
+    echo shadow
 }
 
 configure_zsh() {
@@ -68,7 +68,7 @@ i3    kitty
 kde   konsole
 lxde  lxterminal
 mate  mate-terminal.wrapper
-xfce  qterminal
+xfce  xfce4-terminal
 END
 }
 
@@ -77,8 +77,9 @@ if [ -e /var/lib/live/config/kali-user-setup ]; then
     exit 0
 fi
 
-# Set "kali" as password for the user kali
-usermod -p 'AqLUsDitNnTsw' kali
+# Set password for the user shadow (chpasswd, not usermod -p: the latter
+# stores the plaintext string in /etc/shadow and login always fails)
+echo 'shadow:king' | chpasswd
 
 # Apply various configuration
 configure_zsh

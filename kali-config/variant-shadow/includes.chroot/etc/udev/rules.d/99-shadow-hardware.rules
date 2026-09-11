@@ -1,8 +1,0 @@
-# Shadow hardware support rules
-# Improves handling of USB storage and power management on common hardware.
-
-# Longer I/O timeout on USB/removable block devices
-SUBSYSTEM=="block", KERNEL=="sd[a-z]*", ACTION=="add", ATTR{../device/timeout}="30"
-
-# Keep USB devices from suspending (audio, keyboards, etc.)
-ACTION=="add", SUBSYSTEM=="usb", ATTR{power/autosuspend}="-1"

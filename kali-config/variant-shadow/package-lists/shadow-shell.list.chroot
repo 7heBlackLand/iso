@@ -1,9 +1,0 @@
-## Shadow GNU/Linux - shell and terminal
-## xfce4-terminal is the only graphical terminal emulator.
-## Zsh is the preferred interactive shell, Bash remains for compatibility.
-
-xfce4-terminal
-zsh
-bash
-bash-completion
-xdotool

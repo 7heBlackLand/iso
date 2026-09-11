@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Shadow terminal size state
-# Format: <width> <height>  (updated by ~/.local/bin/shadow-terminal)
-120 35

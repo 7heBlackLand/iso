@@ -37,10 +37,10 @@ target_image_name() {
   if [ "$IMAGE_EXT" = "$IMAGE_NAME" ]; then
     IMAGE_EXT="img"
   fi
-  if [ "$INCLUDE_VARIANT_IN_NAME" = "no" ] || [ "$KALI_VARIANT" = "default" ]; then
-    echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}$IMAGE_NAME_PREFIX-$KALI_VERSION-live-$KALI_ARCH.$IMAGE_EXT"
+  if [ "$KALI_VARIANT" = "default" ]; then
+    echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}kali-linux-$KALI_VERSION-live-$KALI_ARCH.$IMAGE_EXT"
   else
-    echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}$IMAGE_NAME_PREFIX-$KALI_VERSION-live-$KALI_VARIANT-$KALI_ARCH.$IMAGE_EXT"
+    echo "${TARGET_SUBDIR:+$TARGET_SUBDIR/}kali-linux-$KALI_VERSION-live-$KALI_VARIANT-$KALI_ARCH.$IMAGE_EXT"
   fi
 }
 
@@ -129,16 +129,13 @@ require_package() {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Change directory into where the script is
-cd "$(dirname "$0")"/
+cd $(dirname $0)/
 
 # Allowed command line options
 source .getopt.sh
 
 # Parsing command line options (see .getopt.sh)
-if ! temp=$(getopt -o "$BUILD_OPTS_SHORT" -l "$BUILD_OPTS_LONG" -- "$@"); then
-  echo "ERROR: Invalid command-line option" >&2
-  exit 1
-fi
+temp=$(getopt -o "$BUILD_OPTS_SHORT" -l "$BUILD_OPTS_LONG" -- "$@")
 eval set -- "$temp"
 while true; do
   case "$1" in
@@ -174,16 +171,6 @@ elif [ "$KALI_ARCH" = "x86" ]; then
 fi
 debug "KALI_ARCH: $KALI_ARCH"
 
-# Shadow image naming: the shadow variant produces
-# shadow-linux-<version>-live-<arch>.iso (no variant segment)
-IMAGE_NAME_PREFIX="kali-linux"
-INCLUDE_VARIANT_IN_NAME="yes"
-if [ "$KALI_VARIANT" = "shadow" ]; then
-  IMAGE_NAME_PREFIX="shadow-linux"
-  INCLUDE_VARIANT_IN_NAME="no"
-fi
-debug "IMAGE_NAME_PREFIX: $IMAGE_NAME_PREFIX"
-
 if [ -z "$KALI_VERSION" ]; then
   KALI_VERSION="$(default_version $KALI_DIST)"
 fi
@@ -203,7 +190,7 @@ if [ "$HOST_ARCH" != "$KALI_ARCH" ]; then
 fi
 
 # Build parameters for lb config
-KALI_CONFIG_OPTS="--distribution $KALI_DIST -- --variant $KALI_VARIANT"
+KALI_CONFIG_OPTS="--distribution $KALI_DIST --apt-recommends false -- --variant $KALI_VARIANT"
 if [ -n "$OPT_pu" ]; then
   KALI_CONFIG_OPTS="$KALI_CONFIG_OPTS --proposed-updates"
   KALI_DIST="$KALI_DIST+pu"
@@ -223,9 +210,8 @@ else
   echo "ERROR: Non Debian-based OS" >&2
 fi
 
-if [ ! -d "$(dirname "$0")/kali-config/variant-$KALI_VARIANT" ]; then
+if [ ! -d "$(dirname $0)/kali-config/variant-$KALI_VARIANT" ]; then
   echo "ERROR: Unknown variant of Kali live configuration: $KALI_VARIANT" >&2
-  exit 1
 fi
 require_package live-build "1:20250814+kali2"
 
@@ -257,7 +243,7 @@ if [ "$ACTION" = "clean" ]; then
 fi
 
 # Create image output location
-mkdir -pv "$TARGET_DIR/$TARGET_SUBDIR"
+mkdir -pv $TARGET_DIR/$TARGET_SUBDIR
 [ $? -eq 0 ] || failure
 
 # Don't quit on any errors now
@@ -277,7 +263,7 @@ fi
 set -e
 
 debug "Moving files"
-run_and_log mv -f "$IMAGE_NAME" "$TARGET_DIR/$(target_image_name "$KALI_ARCH")"
-run_and_log mv -f "$BUILD_LOG" "$TARGET_DIR/$(target_build_log "$KALI_ARCH")"
+run_and_log mv -f $IMAGE_NAME $TARGET_DIR/$(target_image_name $KALI_ARCH)
+run_and_log mv -f "$BUILD_LOG" $TARGET_DIR/$(target_build_log $KALI_ARCH)
 
-echo -e "\n***\nGENERATED KALI IMAGE: $(readlink -f "$TARGET_DIR/$(target_image_name "$KALI_ARCH")")\n***"
+echo -e "\n***\nGENERATED KALI IMAGE: $(readlink -f $TARGET_DIR/$(target_image_name $KALI_ARCH))\n***"

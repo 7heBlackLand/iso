@@ -1,9 +1,0 @@
-## Shadow GNU/Linux - audio
-## PipeWire + WirePlumber + ALSA
-
-pipewire
-pipewire-pulse
-pipewire-audio
-wireplumber
-alsa-utils
-pulseaudio-utils
