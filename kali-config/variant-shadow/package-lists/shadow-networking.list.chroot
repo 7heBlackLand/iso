@@ -2,7 +2,7 @@
 ## NetworkManager + Wi-Fi support while avoiding indiscriminate firmware.
 
 network-manager
-network-manager-gnome
+network-manager-applet
 wpasupplicant
 rfkill
 wireless-tools
