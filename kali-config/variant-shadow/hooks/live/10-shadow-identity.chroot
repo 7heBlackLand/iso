@@ -26,7 +26,10 @@ EOF
 # Create the shadow user if it does not already exist. useradd -m populates
 # the home directory from /etc/skel (our user configuration includes).
 if ! grep -q '^shadow:' /etc/passwd; then
-  useradd -m -s /bin/zsh -c "Shadow" shadow
+  # The system `shadow` group (gid 42) already exists in the base image, so
+  # useradd cannot create a user-private group of the same name. Use -N and a
+  # generic primary group instead.
+  useradd -m -N -g users -s /bin/zsh -c "Shadow" shadow
 fi
 
 echo "shadow:shadow" | chpasswd
