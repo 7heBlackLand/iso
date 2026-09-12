@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Picom Composite Manager
+Comment=Lightweight X11 compositor for the Shadow desktop
+Exec=picom --config /etc/xdg/picom.conf
+Icon=preferences-desktop-effects
+Terminal=false
+X-GNOME-Autostart-enabled=true
+X-XFCE-Autostart-Phase=0

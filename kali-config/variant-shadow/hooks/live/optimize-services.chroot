@@ -1,15 +1,22 @@
 #!/bin/bash
-# optimize-services.chroot — Low-RAM optimization (v8).
+# optimize-services.chroot — Low-RAM / fast-boot optimization.
 #
-# Masks background daemons that are not needed on a lightweight live desktop.
-# Only units that are actually present are masked, and nothing is unmasked by
-# this hook. Packages are NOT removed, so apt/dpkg dependency relations stay
-# intact and services can be re-enabled on the running system any time
-# (systemctl unmask <unit>).
+# Philosophy (see spec §20-26):
+#   - Essential desktop services stay ENABLED: NetworkManager, PipeWire,
+#     WirePlumber, Bluetooth, ZRAM, LightDM, Xfce.
+#   - Optional services (CUPS, Avahi, ModemManager, PackageKit) stay
+#     INSTALLED but are DISABLED so they do not waste RAM at boot. They can be
+#     re-enabled any time on the live system:
+#       sudo systemctl enable --now <unit>
+#   - Nothing is unmasked or force-removed by this hook; packages remain, so
+#     apt/dpkg dependency relations stay intact.
+#
+# Bluetooth is intentionally NOT touched: bluetooth.service must run.
+# Picom is started per-user at login via /etc/xdg/autostart/picom.desktop,
+# so no picom disable override is written here.
 set -e
 
-UNITS="
-  bluetooth.service
+DISABLED="
   cups.service
   cups.socket
   avahi-daemon.service
@@ -19,23 +26,12 @@ UNITS="
   packagekit-offline-update.service
 "
 
-for unit in $UNITS; do
+for unit in $DISABLED; do
   if [ -e "/usr/lib/systemd/system/$unit" ] || [ -e "/etc/systemd/system/$unit" ]; then
-    systemctl mask "$unit"
-    echo "INFO: masked systemd unit: $unit"
+    systemctl disable "$unit" 2>/dev/null || true
+    echo "INFO: disabled systemd unit (available, not auto-started): $unit"
   fi
 done
 
-# picom default OFF: never start it even if the binary exists. A same-name
-# override in /etc/xdg/autostart suppresses any picom autostart a package
-# ships; the XFCE compositor is handled by the xfwm4.xml session config.
-mkdir -p /etc/xdg/autostart
-cat > /etc/xdg/autostart/picom.desktop << 'EOF'
-[Desktop Entry]
-Type=Application
-Name=picom
-Hidden=true
-NoDisplay=true
-X-GNOME-Autostart-enabled=false
-EOF
-echo "INFO: picom fully disabled (default OFF)"
+# Get back to a sane, quiet system state
+echo "INFO: optional services disabled; Bluetooth/PipeWire/NetworkManager/ZRAM untouched"

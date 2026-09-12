@@ -1,10 +1,11 @@
-## Shadow baseline live image
+## Shadow lightweight live image
 ##
-## Software selection: ONLY kali-linux-core + kali-desktop-xfce.
-## kali-desktop-live is included because it provides live-boot / live-config,
-## which are required for the live system to actually boot (priority #1:
-## boot reliability). It is part of Kali's live-boot system, not an extra
-## security tool / application.
+## Kali Linux + Xfce + LightDM + Picom + NetworkManager + Bluetooth + PipeWire
+## + ZRAM + Firefox + essential desktop applications + Live boot.
+##
+## Philosophy: install useful software, do NOT auto-start normal applications,
+## do NOT remove optional services that can be re-enabled later, and keep the
+## big kali-tools-* collections OUT.
 ##
 ## $ ./build.sh --variant shadow
 
@@ -12,25 +13,30 @@
 kali-linux-core
 kali-desktop-live
 
-## Lightweight XFCE desktop
+## Lightweight XFCE desktop. This metapackage pulls Xfce core (xfce4, session,
+## panel, settings, xfconf, xfdesktop4, xfwm4, appfinder), QTerminal, Thunar,
+## Parole, Atril, Ristretto, Engrampa, xfce4-screenshooter, PipeWire audio,
+## LightDM, pavucontrol and more — all listed explicitly below where we
+## depend on them directly.
 kali-desktop-xfce
 
 ## Display manager (auto-login for the shadow user, see common lightdm.conf)
 lightdm
 lightdm-gtk-greeter
 
-## Default shell + terminal (matches terminal-note: zsh is the live user's
-## shell, xfce4-terminal the x-terminal-emulator for the xfce variant)
+## Shell + terminal (QTerminal — installed, NOT auto-started)
 zsh
-xfce4-terminal
+qterminal
 
-## Fonts: Fira Code is the default for all normal/bold text, Cantarell for UI
-## and URW base35 as fallback. fonts-dejavu-core guarantees the ☯ prompt glyph
-## (U+262F, not present in Fira Code) and its box-drawing glyphs. Noto Egyptian
-## Hieroglyphs (extracted from fonts-noto-core by
-## hooks/live/install-noto-glyphs.chroot, package then discarded) is
-## fallback-only for Egyptian glyphs. fonts-noto-core is NOT installed; the
-## extra + CJK sets are too large to keep.
+## Compositor — lightweight config at /etc/xdg/picom.conf, auto-started at
+## login via /etc/xdg/autostart/picom.desktop (see includes.chroot)
+picom
+
+## Fonts: Fira Code default for normal/bold text, Cantarell for UI, URW
+## base35 fallback. fonts-dejavu-core guarantees the ☯ prompt glyph (U+262F)
+## and its box-drawing glyphs. Noto Egyptian Hieroglyphs (extracted from
+## fonts-noto-core by hooks/live/install-noto-glyphs.chroot, package then
+## discarded) is fallback-only for Egyptian glyphs.
 fonts-firacode
 fonts-urw-base35
 fonts-mathjax
@@ -39,31 +45,65 @@ fonts-dejavu-core
 xfonts-utils
 xfonts-encodings
 
-## Thunar file manager extras - volume management, drive/USB auto-mount
+## Thunar file manager extras - volume management, drive/USB auto-mount.
+## Thunar is installed and available but never auto-opens at boot.
 thunar-volman
 thunar-archive-plugin
 gvfs
 gvfs-backends
 udisks2
 
-## Wireless networking - NetworkManager (with nm-applet tray icon), WPA
-## supplicant and rfkill control. network-manager-applet provides the applet;
-## the old transitional network-manager-gnome name does not exist in Kali.
+## Networking - NetworkManager (with nm-applet tray icon), WPA supplicant and
+## rfkill control. NetworkManager must start automatically (essential desktop
+## function); the applet lives in the Xfce panel.
 network-manager
 network-manager-applet
 wpasupplicant
 rfkill
 
-## Audio - modern lightweight PipeWire stack
+## Bluetooth - service stays ENABLED (bluetooth.service is NOT disabled/masked,
+## see hooks/live/optimize-services.chroot). Blueman gives a tray applet and
+## device pairing; pairing headsets/speakers/keyboards works right after login.
+bluez
+blueman
+
+## Audio - modern lightweight PipeWire stack. Services auto-start; the
+## pavucontrol GUI is installed but does NOT open at boot.
 pipewire
+pipewire-pulse
 wireplumber
+pavucontrol
+
+## Web browser - installed, NOT auto-started
+firefox-esr
+
+## Desktop applications - installed, NOT auto-started. Parole/Atril/Ristretto/
+## Engrampa/xfce4-screenshooter are already Depends of kali-desktop-xfce;
+## listed here explicitly so the intent is visible and the selection does not
+## silently shrink if the metapackage changes.
+parole
+atril
+ristretto
+engrampa
+xfce4-screenshooter
+baobab
+gparted
 
 ## Polkit daemon (desktop privilege handling)
 polkitd
 
-## zram swap for low-RAM hardware
+## zram swap for low-RAM hardware (auto-started)
 systemd-zram-generator
 
-## No extra Kali metapackages, security tools, applications, or utilities
-## at the baseline stage. Optimizations are added in later stages, each
-## measured against this baseline.
+## Optional services kept AVAILABLE but DISABLED at boot (see
+## hooks/live/optimize-services.chroot): printing (CUPS), mDNS/Avahi, mobile
+## broadband (ModemManager), PackageKit. Re-enable later with:
+##   sudo systemctl enable --now <unit>
+avahi-daemon
+cups
+modemmanager
+packagekit
+
+## No kali-tools-* / security-tool metapackages on purpose. This is a light
+## desktop, not a preloaded pentest toolkit; tools are installed individually
+## when needed.

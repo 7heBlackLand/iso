@@ -1,4 +1,4 @@
-## Shadow selected security tools (v8)
+## Shadow selected security tools (v9)
 ##
 ## Deliberately small and curated. Install more later on the running system:
 ##   sudo apt update && sudo apt install <package-name>
