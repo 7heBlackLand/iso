@@ -1,5 +1,5 @@
 #!/bin/sh
-# z99-apt-check.chroot — v8 §20: verify apt/dpkg integrity after ALL package
+# z99-apt-check.chroot — v9 §20: verify apt/dpkg integrity after ALL package
 # changes. The z99 prefix sorts this hook last, so it runs after
 # remove-calculator, install-noto-glyphs, optimize-services and every package
 # list. If the dependency graph is broken, the build fails loudly here; a

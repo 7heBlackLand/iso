@@ -68,7 +68,7 @@ i3    kitty
 kde   konsole
 lxde  lxterminal
 mate  mate-terminal.wrapper
-xfce  xfce4-terminal
+xfce  qterminal
 END
 }
 

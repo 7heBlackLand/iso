@@ -47,6 +47,9 @@ xfonts-encodings
 
 ## Thunar file manager extras - volume management, drive/USB auto-mount.
 ## Thunar is installed and available but never auto-opens at boot.
+## (thunar + nm-connection-editor are also hard Depends of kali-desktop-xfce /
+##  network-manager-applet respectively; listed explicitly per spec §5/§7.)
+thunar
 thunar-volman
 thunar-archive-plugin
 gvfs
@@ -58,6 +61,7 @@ udisks2
 ## function); the applet lives in the Xfce panel.
 network-manager
 network-manager-applet
+nm-connection-editor
 wpasupplicant
 rfkill
 

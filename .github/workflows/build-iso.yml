@@ -213,8 +213,8 @@ jobs:
             - Terminal: QTerminal, Green on Black, 30% transparency, Fira Code font
             - Compositor: Picom (lightweight, auto-starts) — shadows + transparency
             - Menubar: Hidden
-            - Fonts: Fira Code only (monospace)
-            - Calculator: Removed
+            - Fonts: Fira Code (preferred, with DejaVu glyph fallback)
+            - Calculator: kept (mate-calc is a hard dependency of kali-desktop-xfce)
             - Browser: Firefox ESR
             - Network: Ethernet Connected, Wi-Fi Ready
             - Bluetooth: ON (blueman tray applet, pairing ready)
